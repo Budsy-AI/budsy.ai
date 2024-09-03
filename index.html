@@ -63,6 +63,15 @@
             border-radius: 4px;
             text-align: center;
         }
+        #errorMessage {
+            display: none;
+            background-color: #f2dede;
+            color: #a94442;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -95,7 +104,7 @@
         <section>
             <h2>Ready to Get Started?</h2>
             <p>Fill out this form to begin creating your AI agent and revolutionize your business operations!</p>
-            <form id="contactForm" action="https://formspree.io/f/mgvwqanz" method="POST">
+            <form id="contactForm">
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" required>
 
@@ -115,25 +124,45 @@
                 <h3>Thanks for reaching out!</h3>
                 <p>We've received your request and will get back to you soon.</p>
             </div>
+            <div id="errorMessage">
+                <h3>Oops! Something went wrong.</h3>
+                <p>Please try submitting your request again. If the problem persists, please contact us directly.</p>
+            </div>
         </section>
     </main>
 
     <footer>
-        <p>&copy; 2024 AI Agent Creation. All rights reserved.</p>
+        <p>&copy; 2024 Budsy Inc. All rights reserved.</p>
     </footer>
 
     <script>
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Show thank you message
-            document.getElementById('thankYouMessage').style.display = 'block';
+            var form = this;
+            var formData = new FormData(form);
             
-            // Hide the form
-            this.style.display = 'none';
-            
-            // Submit the form
-            this.submit();
+            fetch("https://formspree.io/f/mgvwqanz", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    // Show thank you message
+                    document.getElementById('thankYouMessage').style.display = 'block';
+                    // Hide the form
+                    form.style.display = 'none';
+                } else {
+                    throw new Error('Form submission failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').style.display = 'block';
+            });
         });
     </script>
 </body>
